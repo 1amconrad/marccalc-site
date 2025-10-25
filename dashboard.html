@@ -86,7 +86,7 @@
 
     const PLANILHAS_KEY = 'marccalc_planilhas';
     let planilhasSalvas = JSON.parse(localStorage.getItem(PLANILHAS_KEY)) || {};
-    let planilhaAtualId = null;
+    let planilhaAtualId = null; // Agora começa como null
 
     // === FUNÇÕES BÁSICAS ===
     function formatarMoeda(valor) {
@@ -111,10 +111,10 @@
             const u = parseFloat(inputs[2].value) || 0;
             cellTotal.textContent = formatarMoeda(q * u);
             updateValorMateriais();
-            salvarPlanilhaAtual();
+            // REMOVIDO: salvarPlanilhaAtual()
         };
 
-        inputs.forEach(i => i.addEventListener('input', () => { calcular(); salvarPlanilhaAtual(); }));
+        inputs.forEach(i => i.addEventListener('input', calcular));
 
         inputs.forEach(input => {
             const td = document.createElement('td');
@@ -136,7 +136,7 @@
         return input;
     }
 
-    // === INICIAR COM 3 LINHAS ===
+    // === INICIAR COM 3 LINHAS VAZIAS (NÃO SALVA) ===
     for (let i = 0; i < 3; i++) adicionarLinha();
 
     // === ATUALIZAÇÕES ===
@@ -168,14 +168,13 @@
         resultadoFinal.textContent = `Resultado Final: ${formatarMoeda(final)}`;
     }
 
-    // === EVENTOS PRINCIPAIS ===
+    // === EVENTOS PRINCIPAIS (SEM SALVAR AUTOMÁTICO) ===
     btnValorTotal.addEventListener('click', recalcularTotal);
-    diasInput.addEventListener('input', () => { recalcularTotal(); salvarPlanilhaAtual(); });
-    diariaInput.addEventListener('input', () => { recalcularTotal(); salvarPlanilhaAtual(); });
-    margemLucroInput.addEventListener('input', () => { recalcularTotal(); salvarPlanilhaAtual(); });
+    diasInput.addEventListener('input', recalcularTotal);
+    diariaInput.addEventListener('input', recalcularTotal);
+    margemLucroInput.addEventListener('input', recalcularTotal);
 
-    // === LOCALSTORAGE: SALVAR, CARREGAR, LISTAR ===
-
+    // === SALVAR PLANILHA (SÓ QUANDO CLICAR) ===
     function salvarPlanilhaAtual() {
         if (!planilhaAtualId) {
             planilhaAtualId = 'planilha_' + Date.now();
@@ -183,7 +182,7 @@
 
         const dados = {
             id: planilhaAtualId,
-            nome: planilhasSalvas[planilhaAtualId]?.nome || `Orçamento ${new Date().toLocaleDateString()}`,
+            nome: `Orçamento ${new Date().toLocaleDateString()}`,
             data: new Date().toISOString(),
             materiais: [],
             diasProducao: diasInput.value,
@@ -203,8 +202,13 @@
         planilhasSalvas[planilhaAtualId] = dados;
         localStorage.setItem(PLANILHAS_KEY, JSON.stringify(planilhasSalvas));
         atualizarListaPlanilhas();
+        alert('Planilha salva com sucesso!');
     }
 
+    // === BOTÃO SALVAR PLANILHA (ADICIONE NO HTML) ===
+    // <button class="btn-salvar-planilha" onclick="salvarPlanilhaAtual()">Salvar Planilha</button>
+
+    // === CARREGAR, EXCLUIR, RENOMEAR ===
     function carregarPlanilha(id) {
         const dados = planilhasSalvas[id];
         if (!dados) return;
@@ -248,7 +252,7 @@
                             <span class="planilha-nome" id="nome-${p.id}" style="font-weight:bold;">${p.nome}</span>${ativo}
                             <div id="edit-${p.id}" style="display:none; margin-top:5px;">
                                 <input type="text" class="input-nome" value="${p.nome}" id="input-${p.id}">
-                                <button class="btn-salvar-nome" onclick="salvarNome('${p.id}')" style="background:#4CAF50; color:white; font-size:0.8em; padding:2px 6px;">Salvar</button>
+                                <button onclick="salvarNome('${p.id}')" style="background:#4CAF50; color:white; font-size:0.8em; padding:2px 6px;">Salvar</button>
                                 <button onclick="cancelarEdicao('${p.id}')" style="background:#999; color:white; font-size:0.8em; padding:2px 6px;">Cancelar</button>
                             </div>
                         </div>
@@ -264,11 +268,10 @@
         listaPlanilhas.innerHTML = itens;
     }
 
-    // === EDIÇÃO DE NOME ===
     function iniciarEdicao(id) {
         document.getElementById(`nome-${id}`).style.display = 'none';
         document.getElementById(`edit-${id}`).style.display = 'block';
-        document.getElementById(`input-${id}`).focus();
+        document.getElementById(`input-${p.id}`).focus();
     }
 
     function salvarNome(id) {
@@ -288,9 +291,25 @@
         document.getElementById(`edit-${id}`).style.display = 'none';
     }
 
-    // === SALVAR COMO JSON (DOWNLOAD) ===
+    function novaPlanilha() {
+        if (confirm('Limpar tudo e começar uma nova planilha?')) {
+            planilhaAtualId = null;
+            tabelaBody.innerHTML = '';
+            for (let i = 0; i < 3; i++) adicionarLinha();
+            diasInput.value = '';
+            diariaInput.value = '';
+            margemLucroInput.value = '';
+            updateValorMateriais();
+            recalcularTotal();
+        }
+    }
+
+    // === SALVAR COMO JSON ===
     function salvarComoJSON() {
-        salvarPlanilhaAtual();
+        if (!planilhaAtualId) {
+            alert('Salve a planilha primeiro com o botão "Salvar Planilha".');
+            return;
+        }
         const dados = planilhasSalvas[planilhaAtualId];
         const json = JSON.stringify(dados, null, 2);
         const blob = new Blob([json], { type: 'application/json' });
@@ -302,7 +321,7 @@
         URL.revokeObjectURL(url);
     }
 
-    // === ABRIR JSON (UPLOAD) ===
+    // === ABRIR JSON ===
     function abrirJSON(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -328,20 +347,7 @@
         reader.readAsText(file);
     }
 
-    function novaPlanilha() {
-        if (confirm('Limpar tudo e começar uma nova planilha?')) {
-            planilhaAtualId = null;
-            tabelaBody.innerHTML = '';
-            for (let i = 0; i < 3; i++) adicionarLinha();
-            diasInput.value = '';
-            diariaInput.value = '';
-            margemLucroInput.value = '';
-            updateValorMateriais();
-            recalcularTotal();
-        }
-    }
-
-    // === SALVAR AO PRESSIONAR ENTER / ESC ===
+    // === ENTER / ESC ===
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && e.target.classList.contains('input-nome')) {
             const id = e.target.id.replace('input-', '');
@@ -353,10 +359,10 @@
         }
     });
 
-    // === INICIAR ===
+    // === INICIAR (SEM SALVAR NADA) ===
     atualizarListaPlanilhas();
-    salvarPlanilhaAtual();
 </script>
 </body>
 </html>
+
 
