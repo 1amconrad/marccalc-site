@@ -1,11 +1,11 @@
 const CACHE_NAME = 'marccalc-v1';
 const urlsToCache = [
   '/',
-  '/marccalc-pwa/',
-  '/marccalc-pwa/index.html',
-  '/marccalc-pwa/manifest.json',
-  '/marccalc-pwa/icon-192.png',
-  '/marccalc-pwa/icon-512.png'
+  '/marccalc-app/',
+  '/marccalc-app/index.html',
+  '/marccalc-app/manifest.json',
+  '/marccalc-app/icon-192.png',
+  '/marccalc-app/icon-512.png'
 ];
 
 self.addEventListener('install', event => {
