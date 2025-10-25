@@ -2,7 +2,7 @@
   "name": "MarcCalc",
   "short_name": "MarcCalc",
   "description": "Calculadora de Orçamentos Profissional",
-  "start_url": "/marccalc-pwa/index.html",
+  "start_url": "/marccalc-app/index.html",
   "display": "standalone",
   "background_color": "#f4f4f4",
   "theme_color": "#4CAF50",
