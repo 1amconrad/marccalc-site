@@ -11,8 +11,6 @@
 
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .fade-enter { opacity: 0; transform: translateY(10px); }
-        .fade-enter-active { opacity: 1; transform: translateY(0); transition: opacity 0.3s, transform 0.3s; }
         /* Remove setas do input number */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -27,7 +25,7 @@
                 <div class="inline-flex bg-white/20 p-3 rounded-xl mb-4 text-white">
                     <i class="ph-bold ph-lock-key text-3xl"></i>
                 </div>
-                <h1 class="text-2xl font-bold text-white tracking-tight">MarcCalc Pro</h1>
+                <h1 class="text-2xl font-bold text-white">MarcCalc Pro</h1>
                 <p class="text-indigo-100 text-sm mt-1">Validação de Licença</p>
             </div>
             
@@ -43,7 +41,7 @@
                     <input type="password" id="password" class="w-full border-slate-300 border rounded-xl px-4 py-3 focus:border-indigo-500 transition-all">
                 </div>
                 
-                <button onclick="tentarLogin()" id="btn-login" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center justify-center gap-2">
+                <button id="btn-login-action" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center justify-center gap-2">
                     <span id="btn-text">AUTENTICAR DISPOSITIVO</span>
                     <i class="ph-bold ph-arrow-right"></i>
                 </button>
@@ -52,27 +50,24 @@
     </div>
 
     <div id="view-app" class="flex flex-col h-full hidden">
-        
         <nav class="bg-white border-b border-slate-200 flex-none z-10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16 items-center">
                     <div class="flex items-center gap-2">
-                        <div class="bg-indigo-600 text-white p-1.5 rounded-lg shadow-sm shadow-indigo-200">
+                        <div class="bg-indigo-600 text-white p-1.5 rounded-lg shadow-sm">
                             <i class="ph-bold ph-calculator text-xl"></i>
                         </div>
-                        <span class="font-bold text-xl tracking-tight text-slate-900">MarcCalc</span>
-                        <span class="text-xs bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full border border-emerald-200">PRO</span>
+                        <span class="font-bold text-xl text-slate-900">MarcCalc</span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button onclick="novaPlanilha()" class="hidden sm:flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-indigo-600 transition">
+                        <button id="btn-novo" class="hidden sm:flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-indigo-600 transition">
                             <i class="ph-bold ph-plus-circle"></i> Novo
                         </button>
                         <div class="h-6 w-px bg-slate-200 mx-1 hidden sm:block"></div>
-                        
-                        <button onclick="abrirGerenciador()" class="text-xs font-bold text-slate-600 hover:text-indigo-600 px-3 py-1.5 rounded-lg transition-colors border border-slate-200 flex items-center gap-2">
+                        <button id="btn-meus-devices" class="text-xs font-bold text-slate-600 hover:text-indigo-600 px-3 py-1.5 rounded-lg border border-slate-200 flex items-center gap-2">
                             <i class="ph-bold ph-desktop"></i> Meus Dispositivos
                         </button>
-                        <button onclick="logout()" class="text-xs font-bold text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors border border-red-100">
+                        <button id="btn-logout" class="text-xs font-bold text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
                             SAIR
                         </button>
                     </div>
@@ -82,20 +77,15 @@
 
         <main class="flex-1 overflow-y-auto bg-slate-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
                     <div class="lg:col-span-2 space-y-6">
                         <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
                             <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-10">
                                 <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
                                     <i class="ph-duotone ph-package text-indigo-500"></i> Materiais
                                 </h2>
-                                <div id="valor-materiais" class="text-sm font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg">
-                                    R$ 0,00
-                                </div>
+                                <div id="valor-materiais" class="text-sm font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg">R$ 0,00</div>
                             </div>
-                            
                             <div class="p-6">
                                 <table class="w-full text-left border-collapse">
                                     <thead>
@@ -107,20 +97,16 @@
                                             <th class="pb-3 w-10"></th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tabela-body" class="text-sm">
-                                        </tbody>
+                                    <tbody id="tabela-body" class="text-sm"></tbody>
                                 </table>
-
-                                <button onclick="adicionarLinha()" class="mt-6 flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-4 py-3 rounded-xl transition-all w-full justify-center border border-dashed border-indigo-200 hover:border-indigo-300">
+                                <button id="btn-add-linha" class="mt-6 flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-4 py-3 rounded-xl transition-all w-full justify-center border border-dashed border-indigo-200">
                                     <i class="ph-bold ph-plus"></i> Adicionar Novo Material
                                 </button>
                             </div>
                         </div>
-
                         <div>
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Orçamentos Salvos</h3>
-                            <div id="lista-planilhas" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                </div>
+                            <div id="lista-planilhas" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
                         </div>
                     </div>
 
@@ -129,47 +115,36 @@
                             <h2 class="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
                                 <i class="ph-duotone ph-sliders-horizontal text-indigo-500"></i> Configuração
                             </h2>
-                            
                             <div class="space-y-5">
-                                
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wide">Nome do Projeto</label>
-                                    <input type="text" id="nome-orcamento" placeholder="Ex: Cozinha Sr. João" class="w-full border-slate-200 border rounded-lg px-4 py-3 text-slate-900 font-semibold focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-slate-50 focus:bg-white">
+                                    <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Nome do Projeto</label>
+                                    <input type="text" id="nome-orcamento" class="w-full border-slate-200 border rounded-lg px-4 py-3 text-slate-900 font-semibold focus:ring-2 focus:ring-indigo-500 bg-slate-50">
                                 </div>
-
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wide">Margem de Lucro</label>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Margem de Lucro</label>
                                     <div class="relative group">
-                                        <input type="number" id="margem-lucro" placeholder="20" step="0.01" class="w-full border-slate-200 border rounded-lg px-4 py-3 text-slate-900 font-semibold focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-slate-50 focus:bg-white">
+                                        <input type="number" id="margem-lucro" placeholder="20" class="w-full border-slate-200 border rounded-lg px-4 py-3 text-slate-900 font-semibold focus:ring-2 focus:ring-indigo-500 bg-slate-50">
                                         <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400 font-bold">%</div>
                                     </div>
                                 </div>
-
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wide">Dias Prod.</label>
-                                        <input type="number" id="dias" placeholder="5" min="0" step="1" class="w-full border-slate-200 border rounded-lg px-4 py-3 text-slate-900 font-semibold focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-slate-50 focus:bg-white text-center">
+                                        <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Dias Prod.</label>
+                                        <input type="number" id="dias" placeholder="5" class="w-full border-slate-200 border rounded-lg px-4 py-3 text-slate-900 font-semibold text-center bg-slate-50">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wide">Custo Dia</label>
-                                        <div class="relative">
-                                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs font-bold">R$</span>
-                                            <input type="number" id="diaria" placeholder="100" step="0.01" class="w-full border-slate-200 border rounded-lg pl-8 pr-3 py-3 text-slate-900 font-semibold focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-slate-50 focus:bg-white text-right">
-                                        </div>
+                                        <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Custo Dia</label>
+                                        <input type="number" id="diaria" placeholder="100" class="w-full border-slate-200 border rounded-lg px-3 py-3 text-slate-900 font-semibold text-right bg-slate-50">
                                     </div>
                                 </div>
-
                                 <hr class="border-slate-100 my-2">
-
                                 <div class="text-center bg-indigo-600 rounded-xl p-6 shadow-lg shadow-indigo-200 text-white relative overflow-hidden group">
-                                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white opacity-10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700"></div>
                                     <span class="relative block text-indigo-100 text-sm font-medium mb-1">Preço Final Sugerido</span>
                                     <span id="resultado-final-valor" class="relative block text-4xl font-extrabold tracking-tight">R$ 0,00</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </main>
@@ -179,347 +154,260 @@
         <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
             <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-4">
                 <h3 class="font-bold text-lg text-slate-800">Gerenciar Licenças</h3>
-                <button onclick="document.getElementById('modal-devices').classList.add('hidden')" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-xl"></i></button>
+                <button id="btn-close-modal" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-xl"></i></button>
             </div>
-            <div id="lista-devices-container" class="space-y-3 mb-4 max-h-60 overflow-y-auto">
-                </div>
-            <p class="text-xs text-slate-400 text-center bg-slate-50 p-3 rounded-lg">
-                Remova dispositivos antigos para liberar vagas de acesso.
-            </p>
+            <div id="lista-devices-container" class="space-y-3 mb-4 max-h-60 overflow-y-auto"></div>
+            <p class="text-xs text-slate-400 text-center bg-slate-50 p-3 rounded-lg">Remova dispositivos antigos para liberar vagas.</p>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // 1. CONFIGURAÇÃO E AUTENTICAÇÃO (SUPABASE)
-        // ============================================
-        
-        // COLOQUE SUAS CHAVES AQUI
+        // --- 1. CONFIGURAÇÃO SUPABASE ---
+        // IMPORTANTE: Substitua abaixo pelas suas chaves do Supabase
         const SUPABASE_URL = 'https://yupqupqjflmqhwjroaio.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl1cHF1cHFqZmxtcWh3anJvYWlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxMDQyNDQsImV4cCI6MjA4MTY4MDI0NH0.EMF1j36peTGEFHZ1rj3DqOMRujPBpZkiBaz0W7RJkRM';
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Verifica se o Supabase carregou
+        if (typeof supabase === 'undefined') {
+            alert("Erro crítico: A biblioteca do Supabase não carregou. Verifique sua conexão com a internet.");
+        }
 
-        // Identificação Única deste Navegador (Fica no localStorage para sempre)
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // --- 2. VARIAVEIS GLOBAIS ---
         let deviceToken = localStorage.getItem('marccalc_device_token');
         if (!deviceToken) {
             deviceToken = crypto.randomUUID();
             localStorage.setItem('marccalc_device_token', deviceToken);
         }
 
+        const PLANILHAS_KEY = 'marccalc_planilhas';
+        let planilhasSalvas = JSON.parse(localStorage.getItem(PLANILHAS_KEY)) || {};
+        let planilhaAtualId = null;
+
+        // Elementos DOM
         const viewLogin = document.getElementById('view-login');
         const viewApp = document.getElementById('view-app');
         const msgErro = document.getElementById('msg-erro');
-        const btnLogin = document.getElementById('btn-login');
-
-        // --- Lógica de Login ---
+        const btnLoginAction = document.getElementById('btn-login-action');
+        const tabelaBody = document.getElementById('tabela-body');
+        
+        // --- 3. FUNÇÕES DE AUTENTICAÇÃO ---
         async function tentarLogin() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            
-            // GERA NOME AUTOMÁTICO (ex: Dispositivo 18/12/2025)
             let deviceName = `Dispositivo ${new Date().toLocaleDateString('pt-BR')}`;
 
             if(!email || !password) return mostrarErro("Preencha todos os campos.");
 
             msgErro.classList.add('hidden');
-            btnLogin.disabled = true;
+            btnLoginAction.disabled = true;
             document.getElementById('btn-text').textContent = "VERIFICANDO...";
 
-            // 1. Login Auth
-            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
-
-            if (authError) {
-                mostrarErro("Email ou senha inválidos.");
-                resetBtn();
-                return;
-            }
-
-            const userId = authData.user.id;
-
-            // 2. Validação de Dispositivo (Licenciamento)
             try {
-                // Checa se ESTE device já está na lista
-                const { data: devices } = await supabase.from('user_devices').select('*').eq('user_id', userId);
-                const isAuthorized = devices.find(d => d.device_token === deviceToken);
+                // 1. Login
+                const { data: authData, error: authError } = await sb.auth.signInWithPassword({ email, password });
+                if (authError) throw new Error("Email ou senha inválidos.");
 
+                const userId = authData.user.id;
+
+                // 2. Licenciamento
+                const { data: devices, error: devError } = await sb.from('user_devices').select('*').eq('user_id', userId);
+                if(devError) throw devError;
+
+                const isAuthorized = devices.find(d => d.device_token === deviceToken);
+                
                 if (isAuthorized) {
-                    // Já autorizado, libera
                     mostrarApp();
                     return;
                 }
 
-                // Se não autorizado, checa limite
-                const { data: profile } = await supabase.from('profiles').select('max_devices').eq('id', userId).single();
-                const maxDevices = profile ? profile.max_devices : 1; // Padrão 1 se não tiver perfil
+                // Checa Limite
+                const { data: profile } = await sb.from('profiles').select('max_devices').eq('id', userId).single();
+                // Se não tiver perfil, assume 1 (falha segura)
+                const maxDevices = profile ? profile.max_devices : 1;
 
                 if (devices.length >= maxDevices) {
-                    await supabase.auth.signOut();
-                    mostrarErro(`Limite de licenças atingido (${devices.length}/${maxDevices}). Remova um dispositivo antigo para entrar.`);
-                    resetBtn();
-                    return;
+                    await sb.auth.signOut();
+                    throw new Error(`Limite de licenças atingido (${devices.length}/${maxDevices}).`);
                 }
 
-                // Se tem vaga, cadastra
-                const { error: insertError } = await supabase.from('user_devices').insert({
+                // Cadastra novo
+                const { error: insertError } = await sb.from('user_devices').insert({
                     user_id: userId,
                     device_token: deviceToken,
                     device_name: deviceName
                 });
 
                 if (insertError) throw insertError;
-                
                 mostrarApp();
 
             } catch (err) {
                 console.error(err);
-                mostrarErro("Erro de validação. Contate o suporte.");
-                await supabase.auth.signOut();
+                mostrarErro(err.message || "Erro desconhecido.");
+                await sb.auth.signOut();
                 resetBtn();
             }
         }
 
+        function mostrarErro(msg) {
+            msgErro.textContent = msg;
+            msgErro.classList.remove('hidden');
+            resetBtn();
+        }
+
+        function resetBtn() {
+            btnLoginAction.disabled = false;
+            document.getElementById('btn-text').textContent = "AUTENTICAR DISPOSITIVO";
+        }
+
         async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await sb.auth.getSession();
             if (session) {
-                // Verifica se o dispositivo ainda é válido (caso tenha sido deletado remotamente)
-                const { data: dev } = await supabase
-                    .from('user_devices')
+                // Valida se token ainda existe no banco
+                const { data: dev } = await sb.from('user_devices')
                     .select('id')
                     .eq('user_id', session.user.id)
                     .eq('device_token', deviceToken)
                     .single();
                 
-                if (dev) {
-                    mostrarApp();
-                } else {
-                    // Se não encontrar o device no banco, força logout
-                    await supabase.auth.signOut();
+                if (dev) mostrarApp();
+                else {
+                    await sb.auth.signOut();
                     viewLogin.classList.remove('hidden');
-                    viewApp.classList.add('hidden');
                 }
+            } else {
+                viewLogin.classList.remove('hidden');
             }
         }
 
         async function logout() {
-            await supabase.auth.signOut();
+            await sb.auth.signOut();
             window.location.reload();
         }
 
-        // --- Gerenciador de Dispositivos ---
-        async function abrirGerenciador() {
-            const { data: { user } } = await supabase.auth.getUser();
-            const { data: devices } = await supabase.from('user_devices').select('*').eq('user_id', user.id);
-            const { data: profile } = await supabase.from('profiles').select('max_devices').eq('id', user.id).single();
-
-            const container = document.getElementById('lista-devices-container');
-            container.innerHTML = `
-                <div class="text-sm font-semibold text-indigo-600 mb-3 bg-indigo-50 p-2 rounded text-center">
-                    Utilizando ${devices.length} de ${profile ? profile.max_devices : 1} licenças disponíveis.
-                </div>
-            `;
-
-            devices.forEach(dev => {
-                const isThis = dev.device_token === deviceToken;
-                container.innerHTML += `
-                    <div class="flex justify-between items-center p-3 border rounded-xl ${isThis ? 'border-indigo-500 bg-indigo-50/30' : 'border-slate-100 bg-white'}">
-                        <div>
-                            <div class="font-bold text-sm text-slate-800">${dev.device_name} ${isThis ? '(Este)' : ''}</div>
-                            <div class="text-[10px] text-slate-400">Ativado em: ${new Date(dev.created_at).toLocaleDateString()}</div>
-                        </div>
-                        <button onclick="removerDispositivo('${dev.id}')" class="text-slate-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition">
-                            <i class="ph-bold ph-trash"></i>
-                        </button>
-                    </div>
-                `;
-            });
-            document.getElementById('modal-devices').classList.remove('hidden');
-        }
-
-        async function removerDispositivo(id) {
-            if(confirm("Remover acesso deste dispositivo?")) {
-                await supabase.from('user_devices').delete().eq('id', id);
-                abrirGerenciador(); // Refresh na lista
-            }
-        }
-
-        // Utils UI
+        // --- 4. CALCULADORA & UI ---
         function mostrarApp() {
             viewLogin.classList.add('hidden');
             viewApp.classList.remove('hidden');
-            // Inicializa a calculadora
             atualizarListaPlanilhas();
-            if(!planilhaAtualId && Object.keys(planilhasSalvas).length === 0) {
-                 for(let i=0; i<3; i++) adicionarLinha();
+            if(Object.keys(planilhasSalvas).length === 0 && !planilhaAtualId) {
+                novaPlanilha();
             }
         }
-        function mostrarErro(msg) {
-            msgErro.textContent = msg;
-            msgErro.classList.remove('hidden');
-        }
-        function resetBtn() {
-            btnLogin.disabled = false;
-            document.getElementById('btn-text').textContent = "AUTENTICAR DISPOSITIVO";
-        }
-
-
-        // ============================================
-        // 2. LÓGICA DA CALCULADORA (ORIGINAL)
-        // ============================================
-        const tabelaBody = document.getElementById('tabela-body');
-        const diasInput = document.getElementById('dias');
-        const diariaInput = document.getElementById('diaria');
-        const margemLucroInput = document.getElementById('margem-lucro');
-        const nomeOrcamentoInput = document.getElementById('nome-orcamento');
-        const resultadoFinalValor = document.getElementById('resultado-final-valor');
-        const valorMateriaisDiv = document.getElementById('valor-materiais');
-        const listaPlanilhas = document.getElementById('lista-planilhas');
-
-        const PLANILHAS_KEY = 'marccalc_planilhas';
-        let planilhasSalvas = JSON.parse(localStorage.getItem(PLANILHAS_KEY)) || {};
-        let planilhaAtualId = null;
 
         function formatarMoeda(valor) {
             return `R$ ${valor.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
         }
 
-        window.adicionarLinha = function(material = '', qty = '', unit = '') {
+        function adicionarLinha(material = '', qty = '', unit = '') {
             const tr = document.createElement('tr');
-            tr.className = "group hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 fade-enter-active";
-            
+            tr.className = "group hover:bg-slate-50 border-b border-slate-50";
             tr.innerHTML = `
-                <td class="py-2 pr-2 pl-1">
-                    <input type="text" value="${material}" placeholder="Nome do item" class="input-material w-full border-slate-200 bg-slate-50 border rounded-lg px-3 py-2 text-slate-700 focus:bg-white text-sm transition-all shadow-sm">
-                </td>
-                <td class="py-2 pr-2">
-                    <input type="number" value="${qty}" placeholder="1" class="input-qty w-full border-slate-200 bg-slate-50 border rounded-lg px-2 py-2 text-slate-700 focus:bg-white text-sm transition-all text-center shadow-sm">
-                </td>
-                <td class="py-2 pr-2">
-                    <input type="number" value="${unit}" placeholder="0,00" step="0.01" class="input-unit w-full border-slate-200 bg-slate-50 border rounded-lg px-3 py-2 text-slate-700 focus:bg-white text-sm transition-all shadow-sm">
-                </td>
-                <td class="py-2 text-right font-medium text-slate-900 total-cell text-sm">R$ 0,00</td>
-                <td class="py-2 text-right">
-                    <button class="btn-remove text-slate-300 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-lg transition-all opacity-0 group-hover:opacity-100">
-                        <i class="ph-bold ph-trash"></i>
-                    </button>
-                </td>
+                <td class="py-2 pr-2 pl-1"><input type="text" value="${material}" class="input-material w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"></td>
+                <td class="py-2 pr-2"><input type="number" value="${qty}" class="input-qty w-full border border-slate-200 rounded-lg px-2 py-2 text-center text-sm"></td>
+                <td class="py-2 pr-2"><input type="number" step="0.01" value="${unit}" class="input-unit w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"></td>
+                <td class="py-2 text-right font-medium text-sm total-cell">R$ 0,00</td>
+                <td class="py-2 text-right"><button class="btn-remove text-slate-300 hover:text-red-500"><i class="ph-bold ph-trash"></i></button></td>
             `;
 
-            const inputMat = tr.querySelector('.input-material');
-            const inputQty = tr.querySelector('.input-qty');
-            const inputUnit = tr.querySelector('.input-unit');
-            const cellTotal = tr.querySelector('.total-cell');
-            const btnRemove = tr.querySelector('.btn-remove');
+            // Listeners da Linha
+            const inputs = tr.querySelectorAll('input');
+            inputs.forEach(input => input.addEventListener('input', () => {
+                calcularLinha(tr);
+                updateGeral();
+            }));
 
-            const calcularLinha = () => {
-                const q = parseFloat(inputQty.value) || 0;
-                const u = parseFloat(inputUnit.value) || 0;
-                cellTotal.textContent = formatarMoeda(q * u);
-                cellTotal.dataset.value = (q * u); 
-                updateGeral(); 
-            };
-
-            [inputMat, inputQty, inputUnit].forEach(el => el.addEventListener('input', calcularLinha));
-
-            btnRemove.addEventListener('click', () => {
+            tr.querySelector('.btn-remove').addEventListener('click', () => {
                 tr.remove();
                 updateGeral();
             });
 
             tabelaBody.appendChild(tr);
-            if(qty && unit) calcularLinha();
-        };
-
-        function updateGeral() {
-            let totalMateriais = 0;
-            document.querySelectorAll('.total-cell').forEach(cell => {
-                totalMateriais += parseFloat(cell.dataset.value) || 0;
-            });
-            
-            valorMateriaisDiv.textContent = formatarMoeda(totalMateriais);
-
-            const dias = parseInt(diasInput.value) || 0;
-            const diaria = parseFloat(diariaInput.value) || 0;
-            const totalDiaria = dias * diaria;
-            const margemLucro = parseFloat(margemLucroInput.value) || 0;
-            
-            const base = totalMateriais + totalDiaria;
-            const valorMargem = base * (margemLucro / 100);
-            const final = base + valorMargem;
-
-            resultadoFinalValor.textContent = formatarMoeda(final);
-            
-            salvarPlanilhaAtual();
+            if(qty && unit) calcularLinha(tr);
         }
 
-        window.salvarPlanilhaAtual = function() {
+        function calcularLinha(tr) {
+            const q = parseFloat(tr.querySelector('.input-qty').value) || 0;
+            const u = parseFloat(tr.querySelector('.input-unit').value) || 0;
+            const total = q * u;
+            const cell = tr.querySelector('.total-cell');
+            cell.textContent = formatarMoeda(total);
+            cell.dataset.value = total;
+        }
+
+        function updateGeral() {
+            let totalMat = 0;
+            document.querySelectorAll('.total-cell').forEach(c => totalMat += parseFloat(c.dataset.value) || 0);
+            document.getElementById('valor-materiais').textContent = formatarMoeda(totalMat);
+
+            const dias = parseFloat(document.getElementById('dias').value) || 0;
+            const diaria = parseFloat(document.getElementById('diaria').value) || 0;
+            const margem = parseFloat(document.getElementById('margem-lucro').value) || 0;
+
+            const custo = totalMat + (dias * diaria);
+            const final = custo + (custo * (margem / 100));
+
+            document.getElementById('resultado-final-valor').textContent = formatarMoeda(final);
+            salvarAutomatico();
+        }
+
+        function salvarAutomatico() {
             if (!planilhaAtualId) planilhaAtualId = 'planilha_' + Date.now();
             
-            const nomeDigitado = nomeOrcamentoInput.value.trim();
-            const primeiroMaterial = document.querySelector('.input-material')?.value;
-            let nomeFinal = nomeDigitado || (primeiroMaterial ? `Orçamento: ${primeiroMaterial}` : `Orçamento ${new Date().toLocaleDateString()}`);
-
+            const nome = document.getElementById('nome-orcamento').value || "Orçamento Sem Nome";
             const dados = {
                 id: planilhaAtualId,
-                nome: nomeFinal,
+                nome: nome,
                 data: new Date().toISOString(),
-                materiais: [],
-                diasProducao: diasInput.value,
-                custoDiario: diariaInput.value,
-                margemLucro: margemLucroInput.value,
-                total: resultadoFinalValor.textContent
+                dias: document.getElementById('dias').value,
+                diaria: document.getElementById('diaria').value,
+                margem: document.getElementById('margem-lucro').value,
+                materiais: []
             };
 
-            tabelaBody.querySelectorAll('tr').forEach(row => {
-                const iMat = row.querySelector('.input-material');
-                const iQty = row.querySelector('.input-qty');
-                const iUnit = row.querySelector('.input-unit');
-                if(iMat){
-                    dados.materiais.push({
-                        nome: iMat.value,
-                        quantidade: iQty.value,
-                        valorUnitario: iUnit.value
-                    });
-                }
+            document.querySelectorAll('#tabela-body tr').forEach(tr => {
+                dados.materiais.push({
+                    nome: tr.querySelector('.input-material').value,
+                    qtd: tr.querySelector('.input-qty').value,
+                    unit: tr.querySelector('.input-unit').value
+                });
             });
 
             planilhasSalvas[planilhaAtualId] = dados;
             localStorage.setItem(PLANILHAS_KEY, JSON.stringify(planilhasSalvas));
             atualizarListaPlanilhas();
-        };
+        }
 
-        window.carregarPlanilha = function(id) {
-            const dados = planilhasSalvas[id];
-            if (!dados) return;
-            
+        function novaPlanilha() {
+            tabelaBody.innerHTML = '';
+            ['dias', 'diaria', 'margem-lucro', 'nome-orcamento'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('resultado-final-valor').textContent = 'R$ 0,00';
+            document.getElementById('valor-materiais').textContent = 'R$ 0,00';
+            planilhaAtualId = null;
+            for(let i=0; i<3; i++) adicionarLinha();
+        }
+
+        function carregarPlanilha(id) {
+            const p = planilhasSalvas[id];
+            if(!p) return;
             planilhaAtualId = id;
             tabelaBody.innerHTML = '';
+            document.getElementById('nome-orcamento').value = p.nome;
+            document.getElementById('dias').value = p.dias;
+            document.getElementById('diaria').value = p.diaria;
+            document.getElementById('margem-lucro').value = p.margem;
             
-            nomeOrcamentoInput.value = dados.nome || '';
-            diasInput.value = dados.diasProducao;
-            diariaInput.value = dados.custoDiario;
-            margemLucroInput.value = dados.margemLucro;
-            
-            dados.materiais.forEach(m => adicionarLinha(m.nome, m.quantidade, m.valorUnitario));
-            updateGeral();
-        };
-
-        window.novaPlanilha = function() {
-            if (confirm('Deseja iniciar um novo orçamento?')) {
-                planilhaAtualId = null;
-                tabelaBody.innerHTML = '';
-                for (let i = 0; i < 3; i++) adicionarLinha();
-                nomeOrcamentoInput.value = '';
-                diasInput.value = '';
-                diariaInput.value = '';
-                margemLucroInput.value = '';
-                updateGeral();
+            if(p.materiais && p.materiais.length) {
+                p.materiais.forEach(m => adicionarLinha(m.nome, m.qtd, m.unit));
+            } else {
+                adicionarLinha();
             }
-        };
-        
-        window.excluirPlanilha = function(id, e) {
-            e.stopPropagation();
-            if(confirm('Excluir este orçamento permanentemente?')) {
+            updateGeral();
+        }
+
+        function excluirPlanilha(id) {
+            if(confirm("Excluir orçamento?")) {
                 delete planilhasSalvas[id];
                 localStorage.setItem(PLANILHAS_KEY, JSON.stringify(planilhasSalvas));
                 if(planilhaAtualId === id) novaPlanilha();
@@ -527,54 +415,86 @@
             }
         }
 
-        window.renomearPlanilhaLista = function(id, e) {
-            e.stopPropagation();
-            const nomeAtual = planilhasSalvas[id].nome;
-            const novoNome = prompt("Renomear Orçamento para:", nomeAtual);
-            if (novoNome && novoNome.trim() !== "") {
-                planilhasSalvas[id].nome = novoNome.trim();
-                localStorage.setItem(PLANILHAS_KEY, JSON.stringify(planilhasSalvas));
-                if (planilhaAtualId === id) nomeOrcamentoInput.value = novoNome.trim();
-                atualizarListaPlanilhas();
-            }
-        }
-
         function atualizarListaPlanilhas() {
-            if (Object.keys(planilhasSalvas).length === 0) {
-                listaPlanilhas.innerHTML = '<div class="col-span-2 text-center text-sm text-slate-400 py-4">Nenhum orçamento salvo.</div>';
-                return;
-            }
-
-            const html = Object.values(planilhasSalvas)
-                .sort((a, b) => new Date(b.data) - new Date(a.data))
-                .map(p => {
-                    const ativo = p.id === planilhaAtualId ? 'border-indigo-500 ring-1 ring-indigo-500 bg-indigo-50/50' : 'border-slate-200 hover:border-indigo-300 hover:shadow-md';
-                    const dataFormatada = new Date(p.data).toLocaleDateString('pt-BR');
-                    
-                    return `
-                        <div onclick="carregarPlanilha('${p.id}')" class="cursor-pointer bg-white p-3 rounded-xl border ${ativo} transition-all flex justify-between items-center group relative">
-                            <div>
-                                <h4 class="font-semibold text-sm text-slate-800 truncate max-w-[150px]">${p.nome}</h4>
-                                <p class="text-xs text-slate-500 mt-0.5">${dataFormatada} • <span class="text-indigo-600 font-medium">${p.total || 'R$ 0,00'}</span></p>
-                            </div>
-                            <div class="flex gap-1">
-                                <button onclick="renomearPlanilhaLista('${p.id}', event)" class="text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 p-2 rounded-lg transition-colors" title="Renomear"><i class="ph-bold ph-pencil-simple"></i></button>
-                                <button onclick="excluirPlanilha('${p.id}', event)" class="text-slate-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Excluir"><i class="ph-bold ph-trash"></i></button>
-                            </div>
+            const container = document.getElementById('lista-planilhas');
+            container.innerHTML = '';
+            Object.values(planilhasSalvas)
+                .sort((a,b) => new Date(b.data) - new Date(a.data))
+                .forEach(p => {
+                    const div = document.createElement('div');
+                    const isAtiva = p.id === planilhaAtualId;
+                    div.className = `p-3 rounded-xl border cursor-pointer flex justify-between items-center ${isAtiva ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 bg-white'}`;
+                    div.innerHTML = `
+                        <div onclick="carregarPlanilha('${p.id}')" class="flex-1">
+                            <div class="font-bold text-sm">${p.nome}</div>
+                            <div class="text-xs text-slate-500">${new Date(p.data).toLocaleDateString()}</div>
                         </div>
+                        <button class="btn-del-planilha text-slate-300 hover:text-red-500 p-2"><i class="ph-bold ph-trash"></i></button>
                     `;
-                }).join('');
-            listaPlanilhas.innerHTML = html;
+                    div.querySelector('.btn-del-planilha').onclick = (e) => { e.stopPropagation(); excluirPlanilha(p.id); };
+                    container.appendChild(div);
+                });
         }
 
-        // Listeners
-        diasInput.addEventListener('input', updateGeral);
-        diariaInput.addEventListener('input', updateGeral);
-        margemLucroInput.addEventListener('input', updateGeral);
-        nomeOrcamentoInput.addEventListener('input', updateGeral);
+        // --- 5. GERENCIADOR DE DISPOSITIVOS ---
+        async function abrirGerenciador() {
+            const modal = document.getElementById('modal-devices');
+            const lista = document.getElementById('lista-devices-container');
+            lista.innerHTML = '<div class="text-center text-sm text-slate-400">Carregando...</div>';
+            modal.classList.remove('hidden');
 
-        // Inicializa Login
-        init();
+            const { data: { user } } = await sb.auth.getUser();
+            const { data: devices } = await sb.from('user_devices').select('*').eq('user_id', user.id);
+            
+            lista.innerHTML = '';
+            devices.forEach(d => {
+                const isMe = d.device_token === deviceToken;
+                const div = document.createElement('div');
+                div.className = `flex justify-between items-center p-3 border rounded-lg ${isMe ? 'bg-indigo-50 border-indigo-200' : 'bg-white border-slate-100'}`;
+                div.innerHTML = `
+                    <div>
+                        <div class="text-sm font-bold text-slate-700">${d.device_name || 'Sem nome'} ${isMe ? '(Atual)' : ''}</div>
+                        <div class="text-xs text-slate-400">${new Date(d.created_at).toLocaleDateString()}</div>
+                    </div>
+                    ${!isMe ? `<button class="text-red-400 hover:text-red-600 p-2"><i class="ph-bold ph-trash"></i></button>` : ''}
+                `;
+                if(!isMe) {
+                    div.querySelector('button').onclick = async () => {
+                        if(confirm("Remover acesso deste dispositivo?")) {
+                            await sb.from('user_devices').delete().eq('id', d.id);
+                            abrirGerenciador();
+                        }
+                    };
+                }
+                lista.appendChild(div);
+            });
+        }
+
+        // --- 6. EVENT LISTENERS (Aqui garantimos que o JS funciona) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Listeners de Login
+            btnLoginAction.addEventListener('click', tentarLogin);
+            
+            // Listeners App
+            document.getElementById('btn-novo').addEventListener('click', novaPlanilha);
+            document.getElementById('btn-logout').addEventListener('click', logout);
+            document.getElementById('btn-add-linha').addEventListener('click', () => adicionarLinha());
+            
+            // Listeners Inputs Globais
+            ['nome-orcamento', 'margem-lucro', 'dias', 'diaria'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateGeral);
+            });
+
+            // Modal
+            document.getElementById('btn-meus-devices').addEventListener('click', abrirGerenciador);
+            document.getElementById('btn-close-modal').addEventListener('click', () => {
+                document.getElementById('modal-devices').classList.add('hidden');
+            });
+
+            // Inicializa
+            init();
+        });
+
     </script>
 </body>
 </html>
