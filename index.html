@@ -42,10 +42,6 @@
                     <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Senha</label>
                     <input type="password" id="password" class="w-full border-slate-300 border rounded-xl px-4 py-3 focus:border-indigo-500 transition-all">
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Nome deste PC</label>
-                    <input type="text" id="device-name" placeholder="Ex: Notebook Trabalho" class="w-full border-slate-300 border rounded-xl px-4 py-3 focus:border-indigo-500 transition-all bg-slate-50">
-                </div>
                 
                 <button onclick="tentarLogin()" id="btn-login" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center justify-center gap-2">
                     <span id="btn-text">AUTENTICAR DISPOSITIVO</span>
@@ -220,7 +216,9 @@
         async function tentarLogin() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            let deviceName = document.getElementById('device-name').value || `PC ${new Date().toLocaleDateString()}`;
+            
+            // GERA NOME AUTOMÁTICO (ex: Dispositivo 18/12/2025)
+            let deviceName = `Dispositivo ${new Date().toLocaleDateString('pt-BR')}`;
 
             if(!email || !password) return mostrarErro("Preencha todos os campos.");
 
@@ -580,4 +578,3 @@
     </script>
 </body>
 </html>
-
