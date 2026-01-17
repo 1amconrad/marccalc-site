@@ -9,19 +9,24 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
-        
-        .input-material { min-width: 120px; }
-        .input-qty { min-width: 50px; }
-        .input-unit { min-width: 70px; }
+   <style>
+    body { font-family: 'Inter', sans-serif; }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
+    
+    .input-material { min-width: 120px; }
+    .input-qty { min-width: 50px; }
+    .input-unit { min-width: 70px; }
 
-        .drawer-open { transform: translateX(0); }
-        .drawer-closed { transform: translateX(100%); }
-    </style>
+    /* --- ANIMAÇÃO DO CATÁLOGO --- */
+    #drawer-catalogo {
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Animação suave */
+    }
+    
+    .drawer-open { transform: translateX(0); } /* Visível */
+    .drawer-closed { transform: translateX(100%); } /* Escondido (Fora da tela) */
+</style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen supports-[height:100dvh]:h-[100dvh] overflow-hidden flex flex-col">
 
@@ -699,3 +704,4 @@
     </script>
 </body>
 </html>
+
