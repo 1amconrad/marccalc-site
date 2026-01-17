@@ -4,69 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MarcCalc Pro - Sistema Integrado</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-   <style>
-    body { font-family: 'Inter', sans-serif; }
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-    input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
-    
-    .input-material { min-width: 120px; }
-    .input-qty { min-width: 50px; }
-    .input-unit { min-width: 70px; }
-
-    /* --- ANIMAÇÃO DO CATÁLOGO --- */
-    #drawer-catalogo {
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Animação suave */
-    }
-    
-    .drawer-open { transform: translateX(0); } /* Visível */
-    .drawer-closed { transform: translateX(100%); } /* Escondido (Fora da tela) */
-</style>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Remove setas dos inputs numéricos */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        /* Estilo de Foco */
+        input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
+        
+        /* Larguras minímas para inputs da tabela */
+        .input-material { min-width: 120px; }
+        .input-qty { min-width: 50px; }
+        .input-unit { min-width: 70px; }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen supports-[height:100dvh]:h-[100dvh] overflow-hidden flex flex-col">
 
     <datalist id="lista-catalogo-global"></datalist>
-    <div id="backdrop-catalogo" class="fixed inset-0 bg-black/30 z-40 hidden transition-opacity opacity-0"></div>
 
-<div id="drawer-catalogo" class="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white shadow-2xl drawer-closed flex flex-col">
-    
-    <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
-            <i class="ph-duotone ph-book-open text-indigo-600"></i> Catálogo de Produtos
-        </h3>
-        <button id="btn-fechar-catalogo" class="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-200 transition">
-            <i class="ph-bold ph-x text-xl"></i>
-        </button>
-    </div>
-
-    <div class="p-4 bg-white border-b border-slate-100 space-y-3">
-        <p class="text-xs font-bold text-slate-400 uppercase">Novo Cadastro</p>
-        <div class="flex gap-2">
-            <input type="text" id="cat-nome" placeholder="Ex: MDF Branco 15mm" class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-        </div>
-        <div class="flex gap-2">
-            <div class="relative flex-1">
-                <span class="absolute left-3 top-2 text-slate-400 text-sm">R$</span>
-                <input type="number" inputmode="decimal" id="cat-preco" placeholder="0,00" class="w-full border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-            </div>
-            <button id="btn-add-catalogo" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-lg font-bold text-sm transition shadow-lg shadow-indigo-200">
-                SALVAR
-            </button>
-        </div>
-        <p class="text-[10px] text-slate-400 text-center">Itens salvos aparecem automaticamente na tabela principal.</p>
-    </div>
-
-    <div class="flex-1 overflow-y-auto p-4 bg-slate-50">
-        <div id="lista-catalogo" class="space-y-2">
-            <div class="text-center text-slate-400 text-sm mt-10">Carregando catálogo...</div>
-        </div>
-    </div>
-</div>
     <div id="view-login" class="fixed inset-0 z-50 bg-slate-900 flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden">
             <div class="bg-indigo-600 p-8 text-center">
@@ -98,6 +61,7 @@
     </div>
 
     <div id="view-app" class="flex flex-col h-full hidden relative">
+        
         <nav class="bg-white border-b border-slate-200 flex-none z-10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16 items-center">
@@ -212,8 +176,9 @@
             </div>
         </main>
 
-        <div id="backdrop-catalogo" class="fixed inset-0 bg-black/30 z-40 hidden transition-opacity"></div>
-        <div id="drawer-catalogo" class="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white shadow-2xl transform transition-transform duration-300 drawer-closed flex flex-col">
+        <div id="backdrop-catalogo" class="fixed inset-0 bg-black/30 z-40 hidden opacity-0 transition-opacity duration-300"></div>
+
+        <div id="drawer-catalogo" class="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
             
             <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
                 <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
@@ -227,14 +192,14 @@
             <div class="p-4 bg-white border-b border-slate-100 space-y-3">
                 <p class="text-xs font-bold text-slate-400 uppercase">Novo Cadastro</p>
                 <div class="flex gap-2">
-                    <input type="text" id="cat-nome" placeholder="Ex: MDF Branco 15mm" class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm">
+                    <input type="text" id="cat-nome" placeholder="Ex: MDF Branco 15mm" class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div class="flex gap-2">
                     <div class="relative flex-1">
                         <span class="absolute left-3 top-2 text-slate-400 text-sm">R$</span>
-                        <input type="number" inputmode="decimal" id="cat-preco" placeholder="0,00" class="w-full border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-sm">
+                        <input type="number" inputmode="decimal" id="cat-preco" placeholder="0,00" class="w-full border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500">
                     </div>
-                    <button id="btn-add-catalogo" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-lg font-bold text-sm">
+                    <button id="btn-add-catalogo" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-lg font-bold text-sm shadow hover:shadow-md transition">
                         SALVAR
                     </button>
                 </div>
@@ -243,11 +208,10 @@
 
             <div class="flex-1 overflow-y-auto p-4 bg-slate-50">
                 <div id="lista-catalogo" class="space-y-2">
-                    <div class="text-center text-slate-400 text-sm mt-10">Nenhum item no catálogo.</div>
+                    <div class="text-center text-slate-400 text-sm mt-10">Carregando catálogo...</div>
                 </div>
             </div>
         </div>
-
     </div>
 
     <div id="modal-devices" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -297,7 +261,7 @@
         const drawerCatalogo = document.getElementById('drawer-catalogo');
         const backdropCatalogo = document.getElementById('backdrop-catalogo');
         const listaCatalogoEl = document.getElementById('lista-catalogo');
-        const datalistEl = document.getElementById('lista-catalogo-global'); // DATALIST
+        const datalistEl = document.getElementById('lista-catalogo-global');
         const inputCatNome = document.getElementById('cat-nome');
         const inputCatPreco = document.getElementById('cat-preco');
 
@@ -393,43 +357,12 @@
             window.location.reload();
         }
 
-        function toggleCatalogo() {
-    const drawer = document.getElementById('drawer-catalogo');
-    const backdrop = document.getElementById('backdrop-catalogo');
-    const inputNome = document.getElementById('cat-nome');
-
-    // Verifica se está fechado (contém a classe drawer-closed)
-    const isClosed = drawer.classList.contains('drawer-closed');
-
-    if (isClosed) {
-        // ABRIR
-        backdrop.classList.remove('hidden');
-        // Pequeno delay para permitir que a transição de opacidade funcione (se desejar fade no fundo)
-        setTimeout(() => {
-            backdrop.classList.remove('opacity-0');
-            drawer.classList.remove('drawer-closed');
-            drawer.classList.add('drawer-open');
-        }, 10);
-        
-        inputNome.focus();
-    } else {
-        // FECHAR
-        drawer.classList.remove('drawer-open');
-        drawer.classList.add('drawer-closed');
-        backdrop.classList.add('opacity-0');
-        
-        // Espera a animação do drawer terminar para esconder o backdrop totalmente
-        setTimeout(() => {
-            backdrop.classList.add('hidden');
-        }, 300); // 300ms deve bater com o tempo do CSS
-    }
-}
         // --- 4. CALCULADORA & UI ---
         function mostrarApp() {
             viewLogin.classList.add('hidden');
             viewApp.classList.remove('hidden');
             atualizarListaPlanilhas();
-            renderizarCatalogo(); // Carrega o catálogo visual e a datalist
+            renderizarCatalogo(); 
             if(Object.keys(planilhasSalvas).length === 0 && !planilhaAtualId) {
                 novaPlanilha();
             }
@@ -443,7 +376,7 @@
             const tr = document.createElement('tr');
             tr.className = "group hover:bg-slate-50 border-b border-slate-50";
             
-            // Aqui está a MÁGICA: list="lista-catalogo-global" conecta ao datalist
+            // list="lista-catalogo-global" conecta ao datalist
             tr.innerHTML = `
                 <td class="py-2 pr-2 pl-1">
                     <input type="text" list="lista-catalogo-global" value="${material}" class="input-material w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500" placeholder="Nome do item...">
@@ -459,20 +392,16 @@
             const inputUnit = tr.querySelector('.input-unit');
             const inputs = tr.querySelectorAll('input');
 
-            // Lógica de Auto-Preenchimento do Preço
+            // Auto-Preenchimento
             inputMaterial.addEventListener('input', () => {
                 const val = inputMaterial.value;
-                // Procura no catálogo
                 const itemEncontrado = catalogoItens.find(i => i.nome === val);
                 
                 if (itemEncontrado) {
-                    // Se achou, preenche o preço
                     inputUnit.value = itemEncontrado.preco;
                     calcularLinha(tr);
                     updateGeral();
-                    
-                    // Joga o foco para quantidade se o usuário selecionou da lista
-                    // Pequeno delay para garantir que o navegador processou o input
+                    // Pequeno delay para focar na qtd
                     setTimeout(() => inputQty.focus(), 100);
                 }
             });
@@ -490,7 +419,6 @@
             tabelaBody.appendChild(tr);
             if(qty && unit) calcularLinha(tr);
             
-            // Se veio do clique "Usar" do catálogo lateral, foca na quantidade
             if(material && unit && !qty) {
                  inputQty.focus();
             }
@@ -605,18 +533,36 @@
                 });
         }
 
-        // --- 5. LOGICA DO CATÁLOGO ---
+        // --- 5. LOGICA DO CATÁLOGO (CORRIGIDA) ---
         function toggleCatalogo() {
-            const isOpen = !drawerCatalogo.classList.contains('drawer-closed');
-            if(isOpen) {
-                drawerCatalogo.classList.add('drawer-closed');
-                drawerCatalogo.classList.remove('drawer-open');
-                backdropCatalogo.classList.add('hidden');
+            const drawer = document.getElementById('drawer-catalogo');
+            const backdrop = document.getElementById('backdrop-catalogo');
+            const inputNome = document.getElementById('cat-nome');
+
+            // Verifica se está oculto (se tem a classe translate-x-full)
+            const isHidden = drawer.classList.contains('translate-x-full');
+
+            if (isHidden) {
+                // ABRIR
+                backdrop.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    backdrop.classList.remove('opacity-0');
+                    drawer.classList.remove('translate-x-full');
+                    drawer.classList.add('translate-x-0');
+                }, 10);
+                
+                setTimeout(() => inputNome.focus(), 300);
             } else {
-                drawerCatalogo.classList.remove('drawer-closed');
-                drawerCatalogo.classList.add('drawer-open');
-                backdropCatalogo.classList.remove('hidden');
-                inputCatNome.focus();
+                // FECHAR
+                drawer.classList.remove('translate-x-0');
+                drawer.classList.add('translate-x-full');
+                
+                backdrop.classList.add('opacity-0');
+                
+                setTimeout(() => {
+                    backdrop.classList.add('hidden');
+                }, 300);
             }
         }
 
@@ -626,7 +572,6 @@
 
             if(!nome) return alert("Digite o nome do produto.");
 
-            // Verifica se já existe para atualizar
             const index = catalogoItens.findIndex(i => i.nome.toLowerCase() === nome.toLowerCase());
             if(index >= 0) {
                 if(!confirm("Este item já existe. Deseja atualizar o preço?")) return;
@@ -636,10 +581,8 @@
                 catalogoItens.push(item);
             }
             
-            // Salvar
             localStorage.setItem(CATALOGO_KEY, JSON.stringify(catalogoItens));
             
-            // Limpar
             inputCatNome.value = '';
             inputCatPreco.value = '';
             inputCatNome.focus();
@@ -648,10 +591,7 @@
         }
 
         function renderizarCatalogo() {
-            // 1. Atualiza lista visual no Drawer
             listaCatalogoEl.innerHTML = '';
-            
-            // 2. Atualiza Datalist (Opções da Tabela)
             datalistEl.innerHTML = '';
 
             if(catalogoItens.length === 0) {
@@ -659,17 +599,16 @@
                 return;
             }
 
-            // Ordenar alfabeticamente
             catalogoItens.sort((a,b) => a.nome.localeCompare(b.nome));
 
             catalogoItens.forEach(item => {
-                // Adiciona ao Datalist (Para aparecer na tabela principal)
+                // Datalist
                 const option = document.createElement('option');
                 option.value = item.nome;
                 option.label = `R$ ${item.preco.toFixed(2)}`;
                 datalistEl.appendChild(option);
 
-                // Adiciona ao Drawer Visual
+                // Drawer
                 const div = document.createElement('div');
                 div.className = "bg-white border border-slate-200 rounded-lg p-3 flex justify-between items-center shadow-sm hover:shadow-md transition group";
                 div.innerHTML = `
@@ -684,7 +623,6 @@
                     </div>
                 `;
 
-                // Botão de Excluir
                 div.querySelector('.btn-del-item').onclick = () => {
                     if(confirm(`Excluir "${item.nome}" do catálogo?`)) {
                         catalogoItens = catalogoItens.filter(i => i.id !== item.id);
@@ -733,42 +671,33 @@
 
         // --- 7. EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Login
             btnLoginAction.addEventListener('click', tentarLogin);
-            
-            // App actions
             document.getElementById('btn-novo').addEventListener('click', novaPlanilha);
             document.getElementById('btn-logout').addEventListener('click', logout);
             document.getElementById('btn-add-linha').addEventListener('click', () => adicionarLinha());
             
-            // Catálogo Actions
+            // Catálogo
             document.getElementById('btn-abrir-catalogo').addEventListener('click', toggleCatalogo);
             document.getElementById('btn-fechar-catalogo').addEventListener('click', toggleCatalogo);
             document.getElementById('backdrop-catalogo').addEventListener('click', toggleCatalogo);
             document.getElementById('btn-add-catalogo').addEventListener('click', addAoCatalogo);
             
-            // Atalho Enter no input de preço do catálogo
             inputCatPreco.addEventListener('keypress', (e) => {
                 if(e.key === 'Enter') addAoCatalogo();
             });
 
-            // Inputs Globais
             ['nome-orcamento', 'margem-lucro', 'dias', 'diaria'].forEach(id => {
                 document.getElementById(id).addEventListener('input', updateGeral);
             });
 
-            // Modal Devices
             document.getElementById('btn-meus-devices').addEventListener('click', abrirGerenciador);
             document.getElementById('btn-close-modal').addEventListener('click', () => {
                 document.getElementById('modal-devices').classList.add('hidden');
             });
 
-            // Inicializa
             init();
         });
 
     </script>
 </body>
 </html>
-
-
