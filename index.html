@@ -31,7 +31,42 @@
 <body class="bg-slate-50 text-slate-800 h-screen supports-[height:100dvh]:h-[100dvh] overflow-hidden flex flex-col">
 
     <datalist id="lista-catalogo-global"></datalist>
+    <div id="backdrop-catalogo" class="fixed inset-0 bg-black/30 z-40 hidden transition-opacity opacity-0"></div>
 
+<div id="drawer-catalogo" class="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white shadow-2xl drawer-closed flex flex-col">
+    
+    <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+            <i class="ph-duotone ph-book-open text-indigo-600"></i> Catálogo de Produtos
+        </h3>
+        <button id="btn-fechar-catalogo" class="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-200 transition">
+            <i class="ph-bold ph-x text-xl"></i>
+        </button>
+    </div>
+
+    <div class="p-4 bg-white border-b border-slate-100 space-y-3">
+        <p class="text-xs font-bold text-slate-400 uppercase">Novo Cadastro</p>
+        <div class="flex gap-2">
+            <input type="text" id="cat-nome" placeholder="Ex: MDF Branco 15mm" class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+        <div class="flex gap-2">
+            <div class="relative flex-1">
+                <span class="absolute left-3 top-2 text-slate-400 text-sm">R$</span>
+                <input type="number" inputmode="decimal" id="cat-preco" placeholder="0,00" class="w-full border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <button id="btn-add-catalogo" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-lg font-bold text-sm transition shadow-lg shadow-indigo-200">
+                SALVAR
+            </button>
+        </div>
+        <p class="text-[10px] text-slate-400 text-center">Itens salvos aparecem automaticamente na tabela principal.</p>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-4 bg-slate-50">
+        <div id="lista-catalogo" class="space-y-2">
+            <div class="text-center text-slate-400 text-sm mt-10">Carregando catálogo...</div>
+        </div>
+    </div>
+</div>
     <div id="view-login" class="fixed inset-0 z-50 bg-slate-900 flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden">
             <div class="bg-indigo-600 p-8 text-center">
@@ -358,6 +393,37 @@
             window.location.reload();
         }
 
+        function toggleCatalogo() {
+    const drawer = document.getElementById('drawer-catalogo');
+    const backdrop = document.getElementById('backdrop-catalogo');
+    const inputNome = document.getElementById('cat-nome');
+
+    // Verifica se está fechado (contém a classe drawer-closed)
+    const isClosed = drawer.classList.contains('drawer-closed');
+
+    if (isClosed) {
+        // ABRIR
+        backdrop.classList.remove('hidden');
+        // Pequeno delay para permitir que a transição de opacidade funcione (se desejar fade no fundo)
+        setTimeout(() => {
+            backdrop.classList.remove('opacity-0');
+            drawer.classList.remove('drawer-closed');
+            drawer.classList.add('drawer-open');
+        }, 10);
+        
+        inputNome.focus();
+    } else {
+        // FECHAR
+        drawer.classList.remove('drawer-open');
+        drawer.classList.add('drawer-closed');
+        backdrop.classList.add('opacity-0');
+        
+        // Espera a animação do drawer terminar para esconder o backdrop totalmente
+        setTimeout(() => {
+            backdrop.classList.add('hidden');
+        }, 300); // 300ms deve bater com o tempo do CSS
+    }
+}
         // --- 4. CALCULADORA & UI ---
         function mostrarApp() {
             viewLogin.classList.add('hidden');
@@ -704,4 +770,5 @@
     </script>
 </body>
 </html>
+
 
