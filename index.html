@@ -20,6 +20,10 @@
         .input-material { min-width: 120px; }
         .input-qty { min-width: 50px; }
         .input-unit { min-width: 70px; }
+
+        /* Animação do Drawer do Catálogo */
+        .drawer-open { transform: translateX(0); }
+        .drawer-closed { transform: translateX(100%); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen supports-[height:100dvh]:h-[100dvh] overflow-hidden flex flex-col">
@@ -54,17 +58,25 @@
         </div>
     </div>
 
-    <div id="view-app" class="flex flex-col h-full hidden">
+    <div id="view-app" class="flex flex-col h-full hidden relative">
         <nav class="bg-white border-b border-slate-200 flex-none z-10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16 items-center">
-                    <div class="flex items-center gap-2">
-                        <div class="bg-indigo-600 text-white p-1.5 rounded-lg shadow-sm">
-                            <i class="ph-bold ph-calculator text-xl"></i>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <div class="bg-indigo-600 text-white p-1.5 rounded-lg shadow-sm">
+                                <i class="ph-bold ph-calculator text-xl"></i>
+                            </div>
+                            <span class="font-bold text-xl text-slate-900 hidden sm:block">MarcCalc</span>
+                            <span class="font-bold text-xl text-slate-900 sm:hidden">MarcCalc</span>
                         </div>
-                        <span class="font-bold text-xl text-slate-900 hidden sm:block">MarcCalc</span>
-                        <span class="font-bold text-xl text-slate-900 sm:hidden">MarcCalc</span>
+                        
+                        <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
+                        <button id="btn-abrir-catalogo" class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg border border-indigo-100 hover:bg-indigo-100 transition text-sm font-semibold">
+                            <i class="ph-bold ph-book-open"></i> <span class="hidden sm:inline">Catálogo</span>
+                        </button>
                     </div>
+
                     <div class="flex items-center gap-2 sm:gap-3">
                         <button id="btn-novo" class="flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-indigo-600 transition p-2 sm:p-0">
                             <i class="ph-bold ph-plus-circle text-xl sm:text-base"></i> 
@@ -112,7 +124,7 @@
                                 </table>
                                 
                                 <button id="btn-add-linha" class="mt-6 flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-4 py-3 rounded-xl transition-all w-full justify-center border border-dashed border-indigo-200">
-                                    <i class="ph-bold ph-plus"></i> Adicionar Novo Material
+                                    <i class="ph-bold ph-plus"></i> Adicionar Nova Linha
                                 </button>
                             </div>
                         </div>
@@ -160,6 +172,42 @@
                 </div>
             </div>
         </main>
+
+        <div id="backdrop-catalogo" class="fixed inset-0 bg-black/30 z-40 hidden transition-opacity"></div>
+        <div id="drawer-catalogo" class="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white shadow-2xl transform transition-transform duration-300 drawer-closed flex flex-col">
+            
+            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                    <i class="ph-duotone ph-book-open text-indigo-600"></i> Catálogo
+                </h3>
+                <button id="btn-fechar-catalogo" class="text-slate-400 hover:text-slate-600 p-2">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+
+            <div class="p-4 bg-white border-b border-slate-100 space-y-3">
+                <p class="text-xs font-bold text-slate-400 uppercase">Novo Item</p>
+                <div class="flex gap-2">
+                    <input type="text" id="cat-nome" placeholder="Nome do Produto" class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div class="flex gap-2">
+                    <div class="relative flex-1">
+                        <span class="absolute left-3 top-2 text-slate-400 text-sm">R$</span>
+                        <input type="number" inputmode="decimal" id="cat-preco" placeholder="0,00" class="w-full border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-sm">
+                    </div>
+                    <button id="btn-add-catalogo" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-lg font-bold text-sm">
+                        <i class="ph-bold ph-plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 bg-slate-50">
+                <div id="lista-catalogo" class="space-y-2">
+                    <div class="text-center text-slate-400 text-sm mt-10">Nenhum item no catálogo.</div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div id="modal-devices" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -175,11 +223,9 @@
 
     <script>
         // --- 1. CONFIGURAÇÃO SUPABASE ---
-        // As chaves permanecem as mesmas
         const SUPABASE_URL = 'https://yupqupqjflmqhwjroaio.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl1cHF1cHFqZmxtcWh3anJvYWlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxMDQyNDQsImV4cCI6MjA4MTY4MDI0NH0.EMF1j36peTGEFHZ1rj3DqOMRujPBpZkiBaz0W7RJkRM';
         
-        // Verifica se o Supabase carregou
         if (typeof supabase === 'undefined') {
             alert("Erro crítico: A biblioteca do Supabase não carregou. Verifique sua conexão com a internet.");
         }
@@ -194,7 +240,10 @@
         }
 
         const PLANILHAS_KEY = 'marccalc_planilhas';
+        const CATALOGO_KEY = 'marccalc_catalogo'; // NOVA CHAVE
+
         let planilhasSalvas = JSON.parse(localStorage.getItem(PLANILHAS_KEY)) || {};
+        let catalogoItens = JSON.parse(localStorage.getItem(CATALOGO_KEY)) || [];
         let planilhaAtualId = null;
 
         // Elementos DOM
@@ -204,6 +253,13 @@
         const btnLoginAction = document.getElementById('btn-login-action');
         const tabelaBody = document.getElementById('tabela-body');
         
+        // Elementos Catálogo
+        const drawerCatalogo = document.getElementById('drawer-catalogo');
+        const backdropCatalogo = document.getElementById('backdrop-catalogo');
+        const listaCatalogoEl = document.getElementById('lista-catalogo');
+        const inputCatNome = document.getElementById('cat-nome');
+        const inputCatPreco = document.getElementById('cat-preco');
+
         // --- 3. FUNÇÕES DE AUTENTICAÇÃO ---
         async function tentarLogin() {
             const email = document.getElementById('email').value;
@@ -236,7 +292,6 @@
 
                 // Checa Limite
                 const { data: profile } = await sb.from('profiles').select('max_devices').eq('id', userId).single();
-                // Se não tiver perfil, assume 1 (falha segura)
                 const maxDevices = profile ? profile.max_devices : 1;
 
                 if (devices.length >= maxDevices) {
@@ -276,7 +331,6 @@
         async function init() {
             const { data: { session } } = await sb.auth.getSession();
             if (session) {
-                // Valida se token ainda existe no banco
                 const { data: dev } = await sb.from('user_devices')
                     .select('id')
                     .eq('user_id', session.user.id)
@@ -303,6 +357,7 @@
             viewLogin.classList.add('hidden');
             viewApp.classList.remove('hidden');
             atualizarListaPlanilhas();
+            renderizarCatalogo(); // Carrega o catálogo
             if(Object.keys(planilhasSalvas).length === 0 && !planilhaAtualId) {
                 novaPlanilha();
             }
@@ -315,16 +370,14 @@
         function adicionarLinha(material = '', qty = '', unit = '') {
             const tr = document.createElement('tr');
             tr.className = "group hover:bg-slate-50 border-b border-slate-50";
-            // Adicionado inputmode="decimal" para teclados de celular
             tr.innerHTML = `
-                <td class="py-2 pr-2 pl-1"><input type="text" value="${material}" class="input-material w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"></td>
+                <td class="py-2 pr-2 pl-1"><input type="text" value="${material}" class="input-material w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"></td>
                 <td class="py-2 pr-2"><input type="number" inputmode="decimal" value="${qty}" class="input-qty w-full border border-slate-200 rounded-lg px-2 py-2 text-center text-sm"></td>
                 <td class="py-2 pr-2"><input type="number" inputmode="decimal" step="0.01" value="${unit}" class="input-unit w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"></td>
                 <td class="py-2 text-right font-medium text-sm total-cell">R$ 0,00</td>
                 <td class="py-2 text-right"><button class="btn-remove text-slate-300 hover:text-red-500 p-2"><i class="ph-bold ph-trash"></i></button></td>
             `;
 
-            // Listeners da Linha
             const inputs = tr.querySelectorAll('input');
             inputs.forEach(input => input.addEventListener('input', () => {
                 calcularLinha(tr);
@@ -338,6 +391,11 @@
 
             tabelaBody.appendChild(tr);
             if(qty && unit) calcularLinha(tr);
+            
+            // Se veio do catálogo (tem valor), foca na quantidade
+            if(material && unit && !qty) {
+                 tr.querySelector('.input-qty').focus();
+            }
         }
 
         function calcularLinha(tr) {
@@ -449,7 +507,100 @@
                 });
         }
 
-        // --- 5. GERENCIADOR DE DISPOSITIVOS ---
+        // --- 5. LOGICA DO CATÁLOGO ---
+        function toggleCatalogo() {
+            const isOpen = !drawerCatalogo.classList.contains('drawer-closed');
+            if(isOpen) {
+                drawerCatalogo.classList.add('drawer-closed');
+                drawerCatalogo.classList.remove('drawer-open');
+                backdropCatalogo.classList.add('hidden');
+            } else {
+                drawerCatalogo.classList.remove('drawer-closed');
+                drawerCatalogo.classList.add('drawer-open');
+                backdropCatalogo.classList.remove('hidden');
+                inputCatNome.focus();
+            }
+        }
+
+        function addAoCatalogo() {
+            const nome = inputCatNome.value.trim();
+            const preco = parseFloat(inputCatPreco.value.replace(',','.')) || 0;
+
+            if(!nome) return alert("Digite o nome do produto.");
+
+            const item = { id: Date.now(), nome, preco };
+            catalogoItens.push(item);
+            
+            // Salvar
+            localStorage.setItem(CATALOGO_KEY, JSON.stringify(catalogoItens));
+            
+            // Limpar
+            inputCatNome.value = '';
+            inputCatPreco.value = '';
+            inputCatNome.focus();
+
+            renderizarCatalogo();
+        }
+
+        function renderizarCatalogo() {
+            listaCatalogoEl.innerHTML = '';
+            
+            if(catalogoItens.length === 0) {
+                listaCatalogoEl.innerHTML = '<div class="text-center text-slate-400 text-sm mt-10">Nenhum item salvo.</div>';
+                return;
+            }
+
+            // Ordenar alfabeticamente
+            catalogoItens.sort((a,b) => a.nome.localeCompare(b.nome));
+
+            catalogoItens.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "bg-white border border-slate-200 rounded-lg p-3 flex justify-between items-center shadow-sm hover:shadow-md transition group";
+                div.innerHTML = `
+                    <div class="flex-1 overflow-hidden">
+                        <div class="font-semibold text-slate-700 truncate text-sm">${item.nome}</div>
+                        <div class="text-xs text-slate-500 font-mono">R$ ${item.preco.toFixed(2)}</div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button class="btn-usar-item bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white p-2 rounded-lg transition" title="Adicionar ao Orçamento">
+                            <i class="ph-bold ph-arrow-left"></i>
+                        </button>
+                        <button class="btn-del-item text-slate-300 hover:text-red-500 p-2 rounded-lg transition">
+                            <i class="ph-bold ph-trash"></i>
+                        </button>
+                    </div>
+                `;
+
+                // Botão de Usar
+                div.querySelector('.btn-usar-item').onclick = () => {
+                    adicionarLinha(item.nome, '', item.preco);
+                    
+                    // Feedback visual rápido
+                    const btn = div.querySelector('.btn-usar-item');
+                    const originalHTML = btn.innerHTML;
+                    btn.innerHTML = '<i class="ph-bold ph-check"></i>';
+                    btn.classList.add('bg-green-100', 'text-green-600');
+                    setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        btn.classList.remove('bg-green-100', 'text-green-600');
+                    }, 1000);
+                };
+
+                // Botão de Excluir
+                div.querySelector('.btn-del-item').onclick = () => {
+                    if(confirm(`Excluir "${item.nome}" do catálogo?`)) {
+                        catalogoItens = catalogoItens.filter(i => i.id !== item.id);
+                        localStorage.setItem(CATALOGO_KEY, JSON.stringify(catalogoItens));
+                        renderizarCatalogo();
+                    }
+                };
+
+                listaCatalogoEl.appendChild(div);
+            });
+        }
+
+
+        // --- 6. GERENCIADOR DE DISPOSITIVOS ---
         async function abrirGerenciador() {
             const modal = document.getElementById('modal-devices');
             const lista = document.getElementById('lista-devices-container');
@@ -483,22 +634,33 @@
             });
         }
 
-        // --- 6. EVENT LISTENERS ---
+        // --- 7. EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Listeners de Login
+            // Login
             btnLoginAction.addEventListener('click', tentarLogin);
             
-            // Listeners App
+            // App actions
             document.getElementById('btn-novo').addEventListener('click', novaPlanilha);
             document.getElementById('btn-logout').addEventListener('click', logout);
             document.getElementById('btn-add-linha').addEventListener('click', () => adicionarLinha());
             
-            // Listeners Inputs Globais
+            // Catálogo Actions
+            document.getElementById('btn-abrir-catalogo').addEventListener('click', toggleCatalogo);
+            document.getElementById('btn-fechar-catalogo').addEventListener('click', toggleCatalogo);
+            document.getElementById('backdrop-catalogo').addEventListener('click', toggleCatalogo);
+            document.getElementById('btn-add-catalogo').addEventListener('click', addAoCatalogo);
+            
+            // Atalho Enter no input de preço do catálogo
+            inputCatPreco.addEventListener('keypress', (e) => {
+                if(e.key === 'Enter') addAoCatalogo();
+            });
+
+            // Inputs Globais
             ['nome-orcamento', 'margem-lucro', 'dias', 'diaria'].forEach(id => {
                 document.getElementById(id).addEventListener('input', updateGeral);
             });
 
-            // Modal
+            // Modal Devices
             document.getElementById('btn-meus-devices').addEventListener('click', abrirGerenciador);
             document.getElementById('btn-close-modal').addEventListener('click', () => {
                 document.getElementById('modal-devices').classList.add('hidden');
